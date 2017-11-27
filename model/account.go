@@ -1,7 +1,6 @@
 package model
 
 import "database/sql"
-import "fmt"
 
 //Account  (TYPE)
 type Account struct {
@@ -19,7 +18,7 @@ type Accounts struct {
 func DoesAccountResourceExist(account *Account) bool {
 
 	err := db.QueryRow("SELECT id, email, password FROM auth_accounts WHERE email=?", account.Email).Scan(&account.ID, &account.Email, &account.Password)
-	fmt.Printf("Error: %v", err)
+
 	if err == sql.ErrNoRows {
 		return false
 	}
@@ -59,7 +58,7 @@ func DoesAccountEmailExistForAnotherID(email string, id int) bool {
 
 //CreateAccount (POST)
 func CreateAccount(account *Account) error {
-	fmt.Printf("email: %s pass: %s", account.Email, account.Password)
+
 	res, err := db.Exec("INSERT INTO auth_accounts VALUES(null, ?, ?)", account.Email, account.Password)
 
 	if err != nil {

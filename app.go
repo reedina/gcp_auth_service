@@ -29,24 +29,22 @@ func (a *App) InitializeApplication(user, password, url, dbname string) {
 //InitializeRoutes - Declare all application routes
 func (a *App) InitializeRoutes() {
 
-	//model.Team struct
-	a.Router.HandleFunc("/api/account", ctrl.CreateAccount).Methods("POST")            // OKAY - Checked
-	a.Router.HandleFunc("/api/accounts", ctrl.GetAccounts).Methods("GET")              // OKAY - Checked
-	a.Router.HandleFunc("/api/account/{id:[0-9]+}", ctrl.GetAccount).Methods("GET")    // OKAY - Checked
-	a.Router.HandleFunc("/api/account/{email}", ctrl.GetAccountByEmail).Methods("GET") // OKAY - Checked
+	//model.Account struct
+	a.Router.HandleFunc("/api/account", ctrl.CreateAccount).Methods("POST")
+	a.Router.HandleFunc("/api/accounts", ctrl.GetAccounts).Methods("GET")
+	a.Router.HandleFunc("/api/account/{id:[0-9]+}", ctrl.GetAccount).Methods("GET")
+	a.Router.HandleFunc("/api/account/{email}", ctrl.GetAccountByEmail).Methods("GET")
 	a.Router.HandleFunc("/api/account/{id:[0-9]+}", ctrl.UpdateAccount).Methods("PUT")
 	a.Router.HandleFunc("/api/account/{id:[0-9]+}", ctrl.DeleteAccount).Methods("DELETE")
-	/*
-		//model.User struct
-		a.Router.HandleFunc("/api/user", ctrl.CreateUser).Methods("POST")
-		a.Router.HandleFunc("/api/users", ctrl.GetUsers).Methods("GET")
-		a.Router.HandleFunc("/api/users/team/name/{name}", ctrl.GetUsersByTeamName).Methods("GET")
-		a.Router.HandleFunc("/api/users/team/id/{id:[0-9]+}", ctrl.GetUsersByTeamID).Methods("GET")
-		a.Router.HandleFunc("/api/user/{id:[0-9]+}", ctrl.GetUser).Methods("GET")
-		a.Router.HandleFunc("/api/user/{email}", ctrl.GetUserByEmail).Methods("GET")
-		a.Router.HandleFunc("/api/user/{id:[0-9]+}", ctrl.UpdateUser).Methods("PUT")
-		a.Router.HandleFunc("/api/user/{id:[0-9]+}", ctrl.DeleteUser).Methods("DELETE")
 
+	//model.Role struct
+	a.Router.HandleFunc("/api/role", ctrl.CreateRole).Methods("POST")
+	a.Router.HandleFunc("/api/roles", ctrl.GetRoles).Methods("GET")
+	a.Router.HandleFunc("/api/role/{id:[0-9]+}", ctrl.GetRole).Methods("GET")
+	a.Router.HandleFunc("/api/role/{id:[0-9]+}", ctrl.UpdateRole).Methods("PUT")
+	a.Router.HandleFunc("/api/role/{id:[0-9]+}", ctrl.DeleteRole).Methods("DELETE")
+
+	/*
 		//model.Project struct
 		a.Router.HandleFunc("/api/project", ctrl.CreateProject).Methods("POST")
 		a.Router.HandleFunc("/api/projects", ctrl.GetProjects).Methods("GET")
