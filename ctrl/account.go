@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"net/mail"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -27,11 +28,22 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Does Role Resource Exist ?
+	if model.DoesRoleIDExist(account.Role.ID) != true {
+		respondWithError(w, http.StatusBadRequest, "Role ID does not exist")
+		return
+	}
 	//Resource does not exist, go ahead and create resource
 	if err := model.CreateAccount(&account); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	// Get Role name for Role id
+	role := model.Role{}
+	role.ID = account.Role.ID
+	model.GetRole(&role)
+	account.Role.Name = role.Name
 
 	respondWithJSON(w, http.StatusCreated, account)
 }
@@ -74,10 +86,16 @@ func GetAccount(w http.ResponseWriter, r *http.Request) {
 //GetAccountByEmail (GET)
 func GetAccountByEmail(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	accountEmail := vars["email"]
+	email, err := mail.ParseAddress(vars["email"])
+	//accountEmail := vars["email"]
+
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid Email Address")
+		return
+	}
 
 	account := model.Account{}
-	account.Email = accountEmail
+	account.Email = email.Address
 
 	if err := model.GetAccountByEmail(&account); err != nil {
 		switch err {
@@ -90,6 +108,57 @@ func GetAccountByEmail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondWithJSON(w, http.StatusOK, account)
+}
+
+//GetAccountsByRoleName (GET)
+func GetAccountsByRoleName(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	accountRoleName := vars["name"]
+
+	account := model.Account{}
+	account.Role.Name = accountRoleName
+
+	users, err := model.GetAccountsByRoleName(&account)
+
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			respondWithError(w, http.StatusNotFound, "Role Name not found")
+		default:
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, users)
+}
+
+//GetAccountsByRoleID (GET)
+func GetAccountsByRoleID(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid User ID")
+		return
+	}
+
+	account := model.Account{}
+	account.Role.ID = id
+
+	accounts, err := model.GetAccountsByRoleID(&account)
+
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			respondWithError(w, http.StatusNotFound, "Role ID not found")
+		default:
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, accounts)
 }
 
 //UpdateAccount (PUT)
@@ -111,6 +180,11 @@ func UpdateAccount(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	account.ID = id
 
+	// Does Role Resource Exist ?
+	if model.DoesRoleIDExist(account.Role.ID) != true {
+		respondWithError(w, http.StatusBadRequest, "Role ID does not exist")
+		return
+	}
 	// Does Account Resource Exist ?
 	if model.DoesAccountIDExist(account.ID) != true {
 		respondWithError(w, http.StatusBadRequest, "Account ID does not exist")
@@ -126,6 +200,11 @@ func UpdateAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get Role name for Role id
+	role := model.Role{}
+	role.ID = account.Role.ID
+	model.GetRole(&role)
+	account.Role.Name = role.Name
 	respondWithJSON(w, http.StatusOK, account)
 }
 

@@ -32,6 +32,8 @@ func (a *App) InitializeRoutes() {
 	//model.Account struct
 	a.Router.HandleFunc("/api/account", ctrl.CreateAccount).Methods("POST")
 	a.Router.HandleFunc("/api/accounts", ctrl.GetAccounts).Methods("GET")
+	a.Router.HandleFunc("/api/accounts/role/name/{name}", ctrl.GetAccountsByRoleName).Methods("GET")
+	a.Router.HandleFunc("/api/accounts/role/id/{id:[0-9]+}", ctrl.GetAccountsByRoleID).Methods("GET")
 	a.Router.HandleFunc("/api/account/{id:[0-9]+}", ctrl.GetAccount).Methods("GET")
 	a.Router.HandleFunc("/api/account/{email}", ctrl.GetAccountByEmail).Methods("GET")
 	a.Router.HandleFunc("/api/account/{id:[0-9]+}", ctrl.UpdateAccount).Methods("PUT")
@@ -44,16 +46,6 @@ func (a *App) InitializeRoutes() {
 	a.Router.HandleFunc("/api/role/{id:[0-9]+}", ctrl.UpdateRole).Methods("PUT")
 	a.Router.HandleFunc("/api/role/{id:[0-9]+}", ctrl.DeleteRole).Methods("DELETE")
 
-	/*
-		//model.Project struct
-		a.Router.HandleFunc("/api/project", ctrl.CreateProject).Methods("POST")
-		a.Router.HandleFunc("/api/projects", ctrl.GetProjects).Methods("GET")
-		a.Router.HandleFunc("/api/projects/team/name/{name}", ctrl.GetProjectsByTeamName).Methods("GET")
-		a.Router.HandleFunc("/api/projects/team/id/{id:[0-9]+}", ctrl.GetProjectsByTeamID).Methods("GET")
-		a.Router.HandleFunc("/api/project/{id:[0-9]+}", ctrl.GetProject).Methods("GET")
-		a.Router.HandleFunc("/api/project/{id:[0-9]+}", ctrl.UpdateProject).Methods("PUT")
-		a.Router.HandleFunc("/api/project/{id:[0-9]+}", ctrl.DeleteProject).Methods("DELETE")
-	*/
 }
 
 //RunApplication - Start the HTTP server

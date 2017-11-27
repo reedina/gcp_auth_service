@@ -7,6 +7,7 @@ type Account struct {
 	ID       int    `json:"id"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	Role     Role   `json:"role"`
 }
 
 //Accounts (TYPE)
@@ -59,7 +60,7 @@ func DoesAccountEmailExistForAnotherID(email string, id int) bool {
 //CreateAccount (POST)
 func CreateAccount(account *Account) error {
 
-	res, err := db.Exec("INSERT INTO auth_accounts VALUES(null, ?, ?)", account.Email, account.Password)
+	res, err := db.Exec("INSERT INTO auth_accounts VALUES(null, ?,?,?)", account.Email, account.Password, account.Role.ID)
 
 	if err != nil {
 		return err
@@ -73,7 +74,8 @@ func CreateAccount(account *Account) error {
 
 //GetAccounts (GET)
 func GetAccounts() ([]Account, error) {
-	rows, err := db.Query("SELECT id, email, password FROM auth_accounts")
+	rows, err := db.Query("SELECT auth_accounts.id, email, password, role_id, name FROM auth_accounts " +
+		"inner join auth_roles on auth_roles.id = role_id")
 
 	if err != nil {
 		return nil, err
@@ -85,7 +87,7 @@ func GetAccounts() ([]Account, error) {
 		defer rows.Close()
 
 		var a Account
-		if err := rows.Scan(&a.ID, &a.Email, &a.Password); err != nil {
+		if err := rows.Scan(&a.ID, &a.Email, &a.Password, &a.Role.ID, &a.Role.Name); err != nil {
 			return nil, err
 		}
 		accounts = append(accounts, a)
@@ -96,19 +98,74 @@ func GetAccounts() ([]Account, error) {
 
 //GetAccount (GET)
 func GetAccount(account *Account) error {
-	return db.QueryRow("SELECT email, password FROM auth_accounts WHERE id=?", account.ID).Scan(&account.Email, &account.Password)
+	return db.QueryRow("SELECT email, password, role_id, name FROM auth_accounts "+
+		"inner join auth_roles on auth_roles.id = role_id "+
+		"WHERE auth_accounts.id=?", account.ID).Scan(&account.Email, &account.Password, &account.Role.ID, &account.Role.Name)
 }
 
 //GetAccountByEmail (GET)
 func GetAccountByEmail(account *Account) error {
-	return db.QueryRow("SELECT id, email, password from auth_accounts where email=?",
-		account.Email).Scan(&account.ID, &account.Email, &account.Password)
+	return db.QueryRow("SELECT auth_accounts.id, email, password, role_id, name from auth_accounts "+
+		"inner join auth_roles on auth_roles.id = role_id where email=?",
+		account.Email).Scan(&account.ID, &account.Email, &account.Password, &account.Role.ID, &account.Role.Name)
+}
+
+//GetAccountsByRoleName (GET)
+func GetAccountsByRoleName(account *Account) ([]Account, error) {
+	rows, err := db.Query("SELECT auth_accounts.id, email, password, role_id"+
+		"name FROM auth_accounts "+
+		"inner join auth_roles on auth_roles.id = role_id WHERE name=?",
+		account.Role.Name)
+
+	if err != nil {
+		return nil, err
+	}
+
+	accounts := []Account{}
+
+	for rows.Next() {
+		defer rows.Close()
+
+		var a Account
+		if err := rows.Scan(&a.ID, &a.Email, &a.Password, &a.Role.ID, &a.Role.Name); err != nil {
+			return nil, err
+		}
+		accounts = append(accounts, a)
+	}
+
+	return accounts, nil
+}
+
+//GetAccountsByRoleID (GET)
+func GetAccountsByRoleID(account *Account) ([]Account, error) {
+	rows, err := db.Query("SELECT auth_accounts.id, email, password, role_id"+
+		"name FROM auth_accounts "+
+		"inner join auth_roles on auth_roles.id = role_id WHERE name=?",
+		account.Role.ID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	accounts := []Account{}
+
+	for rows.Next() {
+		defer rows.Close()
+
+		var a Account
+		if err := rows.Scan(&a.ID, &a.Email, &a.Password, &a.Role.ID, &a.Role.Name); err != nil {
+			return nil, err
+		}
+		accounts = append(accounts, a)
+	}
+
+	return accounts, nil
 }
 
 //UpdateAccount (PUT)
 func UpdateAccount(account *Account) error {
 	_, err :=
-		db.Exec("UPDATE auth_accounts SET email=?,  password=? WHERE id=?", account.Email, account.Password, account.ID)
+		db.Exec("UPDATE auth_accounts SET email=?,  password=?, role_id =? WHERE id=?", account.Email, account.Password, account.Role.ID, account.ID)
 
 	return err
 }
