@@ -13,20 +13,22 @@ spec:
     spec:
       containers:
         - name: rest-web
-          image: gcr.io/vscape-187223/rapuanoauth:v4
+          image: gcr.io/vscape-187223/rapuanoauth:v5
           ports:
             - containerPort: 5040
           env:
-            - name: AUTH_API_DB_HOST
+            - name: GCP_API_DB_HOST
               value: 127.0.0.1:3306
+            - name: GCP_API_DB_NAME
+              value: sre_toolkit
             # These secrets are required to start the pod.
             # [START cloudsql_secrets]
-            - name: AUTH_API_DB_USER
+            - name: GCP_API_DB_USER
               valueFrom:
                 secretKeyRef:
                   name: cloudsql-db-credentials
                   key: username
-            - name: AUTH_API_DB_PASSWORD
+            - name: GCP_API_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: cloudsql-db-credentials

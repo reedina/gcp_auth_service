@@ -3,7 +3,7 @@ FROM golang
 # Copy the local package files to the container's workspace
 ADD . /go/src/github.com/reedina/gcp_auth_service
 
-# Add Environment variables
+# Add Environment variables  -- ADDED in Deployment YAML file
 #ENV AWS_DB_USERNAME mikerapuano
 #ENV AWS_DB_PASSWORD sd4msd5m!2005
 #ENV AWS_DB_NAME rapuano

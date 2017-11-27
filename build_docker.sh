@@ -1,1 +1,1 @@
-docker build -t gcr.io/vscape-187223/rapuanoauth:v4 .
+docker build -t gcr.io/vscape-187223/rapuanoauth:v5 .

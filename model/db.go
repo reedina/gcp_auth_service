@@ -23,22 +23,3 @@ func ConnectDB(user, password, dbname, url string) {
 		db = database
 	}
 }
-
-/*
-//ConnectDB - Establish DB connection
-func ConnectDB(user, password, dbname, url string) {
-
-	cfg := mysql.Cfg("vscape-187223:us-east1:sre-instance", user, password)
-	cfg.DBName = dbname
-	database, err := mysql.DialCfg(cfg)
-	if err != nil {
-		log.Fatal("Cannot find database. Received error: " + err.Error())
-	} else {
-		db = database
-		println("Connected to Database")
-	}
-
-}
-*/
-
-//db, err := sql.Open("mysql", "astaxie:astaxie@/test?charset=utf8")
